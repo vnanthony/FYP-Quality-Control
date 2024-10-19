@@ -1,0 +1,215 @@
+\documentclass{article}
+\usepackage[a4paper, top=1in, bottom=1in, total={6in, 8in}]{geometry}
+
+\title{Experiment Protocol of the Project Non-invasive Blood Glucose Measurement using Photoplethysmography and AI Machine Learning Algorithm}
+\date{Nov 2023}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Diabetes is a chronic disease that affects more than 400 million people worldwide, according to the World Health Organization.
+The blood glucose meter market is expected to grow from USD 7,419.0 Million in 2018 to USD 15,415.6 Million by 2026, with a compound annual growth rate (CAGR) of 9.6\% \cite{noauthor_blood_2019}.
+However, current blood glucose meters rely on invasive blood tests, which may discourage frequent monitoring and fail to provide real-time feedback.
+Therefore, there is an urgent need for a non-invasive blood glucose monitoring device to enhance diabetes management.
+
+Photoplethysmography (PPG) is a promising technique for non-invasive blood glucose measurement, as it can estimate biological parameters from optical signals and has low cost \cite{vargova_estimation_2023}.
+The common approach for using PPG to measure blood glucose level (BGL) is to extract features from PPG signals and then apply machine learning models to estimate the BGL.
+However, most of the existing methods do not meet the clinical requirement, which states that at least 99\% of the results must be within zones A and B of the consensus error grid analysis.
+
+In this study, we propose a novel machine learning algorithm for non-invasive blood glucose measurement using PPG signals.
+We use the largest public dataset (MIMICIII) to train and test our algorithm.
+We also develop a signal processing and feature extraction pipeline to improve the accuracy of the BGL estimation.
+Our results show that our algorithm achieves 93.6\% accuracy, with 96.15\% of the data in zone A and 3.85\% of the data in zone B.
+This is an improvement over the state-of-the-art methods. We are currently working on optimizing our algorithm and designing a specific device for glucose measurement.
+We believe that our method has the potential to reach the clinical accuracy and benefit millions of diabetes patients.
+
+\section{Objectives}
+To evaluate the blood glucose level detection capability of the PPG approach, a study is required to compare the PPG method and the traditional invasive blood glucose testing method.
+Since this study mainly focuses on the blood glucose level of healthy people as a proof of concept, only healthy subjects will be recruited.
+
+\section{Data Delivery}
+\begin{enumerate}
+\item The answers of personal attributes
+\item The heart rate in bpm
+    \begin{enumerate}
+        \item at time 0 min (blood glucose baseline)
+        \item at time 30 mins
+    \end{enumerate}
+\item The 8-minute PPG signal
+    \begin{enumerate}
+        \item at time 0 min (blood glucose baseline)
+        \item at time 30 mins
+    \end{enumerate}
+\item Blood glucose level
+    \begin{enumerate}
+        \item at time 0 min (blood glucose baseline)
+        \item at time 30 mins
+    \end{enumerate}
+\end{enumerate}
+
+\section{Study Protocol}
+This study will be conducted according to the Declaration of Helsinki's ethical principles for medical research on human subjects.
+Informed consent will be obtained from each participating subject. This protocol refers to the Endocrinology Handbook published
+by Imperial College Healthcare NHS Trust \cite{ali_endocrinology_2018}.
+
+\subsection{Selection of the subjects}
+\subsubsection{Source of subjects}
+COCHE, Hong Kong
+\subsubsection{Target number of subjects}
+50
+
+\subsubsection{Inclusion Criteria}
+\begin{itemize}
+\item Healthy people between 18 and 65 years old
+\end{itemize}
+
+\subsubsection{Exclusion Criteria}
+\begin{itemize}
+\item Patients with implantable cardiac devices, including permanent pacemakers, cardiac-resynchronization therapy or defibrillator
+\item Pregnant people
+\item People who are unable to sign the informed consent
+
+\end{itemize}
+
+\section{Study Workflow}
+
+\subsection{Personal attributes}
+\begin{enumerate}
+    \item Age
+    \item Gender
+    \item Height (cm)
+    \item Weight (kg)
+    \item Time elapsed from the last meal (hours)
+    \item Ethnicity
+    \begin{itemize}
+        \item White (white)
+        \item East Asian (east\_asian)
+        \item West Asian (west\_asian)
+        \item Middle Asian (middle\_asian)
+        \item South Asian (south\_asian)
+        \item Southeast Asian (southeast\_asian)
+        \item African Americans (african\_americans)
+        \item Hispanic and Latino Americans (hispanic\_and\_latino\_americans)
+        \item Caribbean or Black (caribbean\_or\_black)
+        \item Other (other)
+    \end{itemize}
+    \item Diabetes situation
+    \begin{itemize}
+        \item No diabetes (no)
+        \item Type 1 diabetes (type\_1)
+        \item Type 2 diabetes (type\_2)
+    \end{itemize}
+    \item The total number of cigarettes consumed from this time last year to the present moment
+    \begin{itemize}
+        \item 0 (a)
+        \item 1-50 (b)
+        \item >50 (c)
+    \end{itemize}
+    \item The monthly average number of times alcohol was consumed from this time last year to the present moment
+    \begin{itemize}
+        \item 0 (a)
+        \item 1-2 (b)
+        \item >2 (c)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Preparation of the Subject}
+\begin{itemize}
+    \item Fast overnight such that there is no food intake for at least \textbf{six} hours.
+\end{itemize}
+\subsection{Preparation of the Researcher}
+\subsubsection{On the Day before the Experiment}
+\begin{enumerate}
+    \item Prepare oral glucose load
+        \begin{enumerate}
+        \item Buy bottles of original-taste Lucozade (70 kCal/100mL formulation)
+        \end{enumerate}
+\end{enumerate}
+\subsubsection{On the Day of the Experiment}
+\begin{enumerate}
+\item Prepare a quiet and relaxing environment without ambient noise.
+\item Use a measuring cup to prepare \underline{440 mL} of Lucozade drink in room temperature.
+\item Prepare the Contour plus ELITE blood glucose monitor
+    \begin{itemize}
+    \item Test paper.
+    \item Replaceable needles.
+    \end{itemize}
+\item Prepare the alcohol wiper for sterilization.
+\item Prepare the Finapres device.
+    \begin{enumerate}
+    \item Connect the SpO2 sensor to the Finapres device.
+    \item Switch on the Finapres device.
+    \item Press 'Setup and start measurement'.
+    \item Press 'Continue'.
+    \item Press 'Reload patient data'.
+    \item Press 'Continue'.
+    \end{enumerate}
+\item Prepare the Analog Devices PPG device.
+    \begin{enumerate}
+    \item Connect the ADPD4200 motherboard to the computer.
+    \item Switch on the motherboard. Two LED lights should be ON.
+    \item Connect the AFE board to the motherboard.
+    \item Open the Wavetool Evaluation software.
+    \item Load the configuration.
+    \item Open C, D and E slots.
+    \end{enumerate}
+\item Prepare a stopwatch.
+\item Prepare a timer and set the time to 8 minutes.
+\item Prepare tissues.
+\item Open the excel file from the folder 'ideation\_lester/ogtt' for recording the personal attributes,\
+the blood glucose level and the PPG file name.
+\end{enumerate}
+
+\subsection{Procedures}
+\begin{enumerate}
+\item Invite a subject who has fasted overnight.
+\item Ask the subject to sign the consent form.
+\item Ask the subject to fill in the diabetes questionnaire.
+\item Ask the subject for his/her personal attributes and record the answers
+\item Ask the subject to sit comfortably on a chair in the prepared environment.
+\item Ask the subject to place the left arm onto the table in a comfortable position.
+\item Read the blood glucose level with the blood glucose monitor.
+    \begin{enumerate}
+    \item Sterilize the whole blood glucose monitor setup with alcohol.
+    \item Place a new replaceable needle into the cartridge of the finger puncturing tool.
+    \item Sterilize the right-hand index fingertip with alcohol.
+    \item Insert the test paper into the blood glucose monitor.
+    \item Ask the subject to use the finger puncturing tool to puncture the right-hand index fingertip.
+
+
+    \item Ask the subject to absorb the blood with the blood glucose test paper.
+    \item Collect the used puncturing tool as a medical waste.
+    \item Provide the subject with tissues to cover the wound on the fingertip.
+    \item Read and record the blood glucose level to the excel file.
+    \end{enumerate}
+\item Use the Finapres device to get the heart rate in bpm.
+    \begin{enumerate}
+    \item Clip the SpO2 sensor onto the subject's left index finger.
+    \item When there is a stable heart rate, record it to the excel file.
+    \item Remove the SpO2 sensor from the subject's left index finger.
+    \end{enumerate}
+\item Use the Analog Devices device to get the PPG signal.
+    \begin{enumerate}
+    \item Fix the PPG sensor onto the subject's thumb with the Finapres clip and a black velcro tape.
+    \item Start logging the PPG signals.
+    \item Start the timer.
+    \item Stop recording the PPG signals when the time is up.
+    \item Save the PPG signals and record the file name in the excel file.
+    \item Remove the PPG sensor from the subject's left hand.
+    \item Move the logged data folder to `ideation\_lester/ogtt/ppg'.
+    \end{enumerate}
+\item If the blood glucose level is higher than 6.9 mmol/L, test the level again \cite{noauthor_indicator_nodate}.
+\item If the level is still higher than 6.9 mmol/L, stop the experiment at this point.
+Suggest the subject that he/she should seek professional medical consultation.
+\item Ask the subject to drink the 440 mL of Lucozade drink within 5 minutes.
+\item Start the stopwatch (time = 0 min).
+\item Repeat steps 6-9 when the stopwatch shows 30 mins.
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{protocol}
+
+\end{document}
