@@ -1,20 +1,20 @@
 import os
-import uuid
-from collections import deque
 from itertools import combinations
+from collections import deque
+import uuid
 
-import dill as pickle
-import numpy as np
 import pandas as pd
-import pyPPG.biomarkers as BM
-import pyPPG.fiducials as FP
-import pyPPG.ppg_sqi as SQI
-import pyPPG.preproc as PP
-from utils_ogtt.feature_generator import FeatureGenerator
-from pyPPG import PPG, Biomarkers, Fiducials
-from pyPPG.datahandling import load_data, plot_fiducials, save_data
+import numpy as np
 from scipy import signal
+import dill as pickle
+from pyPPG import PPG, Fiducials, Biomarkers
+from pyPPG.datahandling import load_data, plot_fiducials, save_data
+import pyPPG.preproc as PP
+import pyPPG.fiducials as FP
+import pyPPG.biomarkers as BM
+import pyPPG.ppg_sqi as SQI
 
+from utils_ogtt.feature_generator import FeatureGenerator
 
 class DataExtractor:
     '''
@@ -84,12 +84,7 @@ class DataExtractor:
     }
 
     data_extractor = DataExtractor(params=params)
-
-    data_extractor.get_df_attr()
-    data_extractor.get_df_attr_seg()
-    data_extractor.filter_signal()
-    data_extractor.get_signal_quality()
-    data_extractor.generate_features()
+    data_extractor.operate()
 
     '''
 
@@ -173,48 +168,32 @@ class DataExtractor:
 
         Returns
         -----------------
-        df_single_ppg : pd.DataFrame
+        df_single_ppg_aligned : pd.DataFrame
             A data frame of the aligned PPG signals
         '''
 
-        combs = combinations(slots, 2)
+        # acquire the intersection of timestamps
+        ts_set = set(df_single_ppg[f'{slots[0]}_ts'].dropna())
 
-        # for each slot combination
-        for comb in combs:
-            slot_0 = comb[0]
-            slot_1 = comb[1]
+        for slot in slots[1:]:
+            ts_set = ts_set.intersection(set(df_single_ppg[f'{slot}_ts'].dropna()))
 
-            # the timestamp differences
-            ts_diff = df_single_ppg[f'{slot_1}_ts'] - df_single_ppg[f'{slot_0}_ts']
-            max_abs_ts_diff = max(abs(ts_diff))
+        ts_list = sorted(list(ts_set))
 
-            if ts_diff.dropna()[0] > 0:
-                direction = 'pos'
-            else:
-                direction = 'neg'
+        # Only keep the signal values with the intersecting timestamps
+        df_single_ppg_aligned = pd.DataFrame()
 
+        for slot in slots:
 
-            # the timestamps of the two slots are already aligned
-            if max_abs_ts_diff == 0:
-                continue
-            else:
-                while max_abs_ts_diff != 0:
-                    # determine the shifting direction
-                    if direction == 'pos':
-                        shift_period = 1
-                    else:
-                        shift_period = -1
+            criteria = (df_single_ppg[f'{slot}_ts'].isin(ts_set)) & (df_single_ppg[f'{slot}_ts'].notna())
+            df_slot = df_single_ppg.loc[criteria, [f'{slot}_ts', f'{slot}_val']].reset_index(drop=True)
+            df_single_ppg_aligned = pd.concat([df_single_ppg_aligned, df_slot], axis=1)
 
-                    # shift the timestamp and values of the slot boms
-                    df_single_ppg[[f'{slot_1}_ts', f'{slot_1}_val']] = df_single_ppg[[f'{slot_1}_ts', f'{slot_1}_val']].shift(shift_period)
+        # convert the timestamp to int
+        for slot in slots:
+            df_single_ppg_aligned[f'{slot}_ts'] = df_single_ppg_aligned[f'{slot}_ts'].astype(int)
 
-                    # the timestamp differences
-                    ts_diff = df_single_ppg[f'{slot_1}_ts'] - df_single_ppg[f'{slot_0}_ts']
-                    max_abs_ts_diff = max(abs(ts_diff))
-
-        df_single_ppg = df_single_ppg.dropna()
-
-        return df_single_ppg
+        return df_single_ppg_aligned
 
 
     def segment_signals(self, df_single_ppg):
@@ -262,10 +241,10 @@ class DataExtractor:
 
             # common attributes for before and after
             common_attr = [
-                'subject_id', 'record_date', 'gender', 'age',
+                'subject_id', 'name', 'record_date', 'gender', 'age',
                 'height', 'weight', 'last_meal_time', 'ethnicity',
                 'diabetes', 'smoking', 'alcohol', 'notes',
-            ] #'name', 
+            ]
 
             # ========== before glucose intake ==========
             new_row_before = row[common_attr].copy()
